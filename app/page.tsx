@@ -128,15 +128,13 @@ export default function Home() {
         </div>
 
         {/* Main Title */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 tracking-tight min-h-[80px] md:min-h-[120px] lg:min-h-[150px] flex items-center justify-center text-glow glitch-text">
-          <span className="glitch-text-inner">
-            {nameTyping.displayedText}
-            <span className="text-primary">
-              {nameTyping.displayedText.includes("Rahul") && nameTyping.isComplete
-                ? ""
-                : nameTyping.displayedText.includes("I") &&
-                  !nameTyping.displayedText.includes("Rahul") && <span className="animate-blink">|</span>}
-            </span>
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 tracking-tight min-h-[80px] md:min-h-[120px] lg:min-h-[150px] flex items-center justify-center text-glow">
+          {nameTyping.displayedText}
+          <span className="text-primary">
+            {nameTyping.displayedText.includes("Rahul") && nameTyping.isComplete
+              ? ""
+              : nameTyping.displayedText.includes("I") &&
+                !nameTyping.displayedText.includes("Rahul") && <span className="animate-blink">|</span>}
           </span>
         </h1>
 

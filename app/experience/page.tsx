@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useTypeWriter } from "@/hooks/use-typewriter"
 
+
 interface Experience {
   title: string
   company: string
@@ -23,6 +24,7 @@ export default function Experience() {
   const [showContent, setShowContent] = useState(false)
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0)
   const [contributions, setContributions] = useState<Contribution[]>([])
+  const [totalContributions, setTotalContributions] = useState(0)
   const [loadingContributions, setLoadingContributions] = useState(true)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
@@ -47,12 +49,22 @@ export default function Experience() {
           throw new Error(`HTTP error! status: ${response.status}`)
         }
         const data = await response.json()
-        console.log('Fetched contributions:', data)
+        console.log('Fetched contributions data:', {
+          contributionsCount: data.contributions?.length || 0,
+          total: data.total,
+          month: data.month,
+          year: data.year,
+          sample: data.contributions?.slice(0, 3)
+        })
+        
         if (data.contributions && Array.isArray(data.contributions)) {
           setContributions(data.contributions)
+          setTotalContributions(data.total || 0)
+          console.log(`Set ${data.contributions.length} contributions, total: ${data.total}`)
         } else {
           console.warn('No contributions found or invalid format:', data)
           setContributions([])
+          setTotalContributions(0)
         }
       } catch (error) {
         console.error('Error fetching contributions:', error)
@@ -178,8 +190,8 @@ export default function Experience() {
           {/* Timeline */}
           <div className="lg:col-span-2">
             <div className="relative pl-4">
-              {/* Vertical Line */}
-              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent" />
+              {/* Vertical Line - centered on bubbles (16px padding + 24px to center of 48px bubble = 40px) */}
+              <div className="absolute left-10 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent z-0" />
 
               {/* Experience Items */}
               <div className="space-y-8">
@@ -192,18 +204,21 @@ export default function Experience() {
                     {/* Timeline Dot */}
                     <div className="flex items-start gap-6">
                       <div className="relative z-10 flex-shrink-0">
+                        {/* Outer circle with consistent styling - all bubbles same size */}
                         <div
-                          className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${
+                          className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all relative ${
                             exp.isActive
-                              ? "border-primary bg-primary/20 shadow-[0_0_15px_rgba(0,255,157,0.4)] animate-pulse"
-                              : "border-primary/40 bg-muted hover:border-primary"
+                              ? "border-primary bg-background shadow-[0_0_15px_rgba(0,255,157,0.4)]"
+                              : "border-primary/40 bg-background hover:border-primary/60"
                           }`}
+                          style={{ zIndex: 10 }}
                         >
-                          {exp.isActive ? (
-                            <span className="w-3 h-3 bg-primary rounded-full shadow-[0_0_8px_rgba(0,255,157,0.8)]" />
-                          ) : (
-                            <span className="w-2 h-2 bg-primary/60 rounded-full" />
-                          )}
+                          {/* Inner dot - consistent styling for all */}
+                          <span className={`rounded-full transition-all ${
+                            exp.isActive
+                              ? "w-3 h-3 bg-primary shadow-[0_0_8px_rgba(0,255,157,0.8)]"
+                              : "w-2.5 h-2.5 bg-primary/60"
+                          }`} />
                         </div>
                       </div>
 
@@ -288,8 +303,12 @@ export default function Experience() {
                 {/* Contributions */}
                 <div>
                   <p className="text-xs text-gray-500 uppercase font-mono tracking-wider mb-2">CONTRIBUTIONS</p>
-                  <p className="text-3xl font-bold text-primary">100+</p>
-                  <p className="text-xs text-gray-400">approx</p>
+                  <p className="text-3xl font-bold text-primary">
+                    {totalContributions > 0 ? totalContributions : '100+'}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {totalContributions > 0 ? 'this month' : 'approx'}
+                  </p>
                 </div>
 
                 {/* Skills Breakdown */}
@@ -354,9 +373,16 @@ export default function Experience() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    {/* Month label */}
-                    <div className="text-[10px] text-gray-500 font-mono mb-1">
-                      {new Date(selectedYear, selectedMonth - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    {/* Month label with total contributions */}
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="text-[10px] text-gray-500 font-mono">
+                        {new Date(selectedYear, selectedMonth - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      </div>
+                      {!loadingContributions && totalContributions > 0 && (
+                        <div className="text-[10px] text-primary font-mono font-bold">
+                          {totalContributions} {totalContributions === 1 ? 'contribution' : 'contributions'}
+                        </div>
+                      )}
                     </div>
                     
                     {/* Weekday labels */}
@@ -486,17 +512,45 @@ export default function Experience() {
                         })()}
                       </div>
                     )}
-                    {/* Legend */}
-                    <div className="flex items-center justify-between text-[10px] text-gray-500 font-mono mt-3">
-                      <span>Less</span>
-                      <div className="flex gap-1">
-                        <div className="w-3 h-3 rounded-sm bg-muted border border-primary/10" />
-                        <div className="w-3 h-3 rounded-sm bg-primary/20 border border-primary/30" />
-                        <div className="w-3 h-3 rounded-sm bg-primary/40 border border-primary/50" />
-                        <div className="w-3 h-3 rounded-sm bg-primary/60 border border-primary/70" />
-                        <div className="w-3 h-3 rounded-sm bg-primary border border-primary" />
+                    {/* Legend and Stats */}
+                    <div className="mt-3 space-y-2">
+                      <div className="flex items-center justify-between text-[10px] text-gray-500 font-mono">
+                        <span>Less</span>
+                        <div className="flex gap-1">
+                          <div className="w-3 h-3 rounded-sm bg-muted border border-primary/10" />
+                          <div className="w-3 h-3 rounded-sm bg-primary/20 border border-primary/30" />
+                          <div className="w-3 h-3 rounded-sm bg-primary/40 border border-primary/50" />
+                          <div className="w-3 h-3 rounded-sm bg-primary/60 border border-primary/70" />
+                          <div className="w-3 h-3 rounded-sm bg-primary border border-primary" />
+                        </div>
+                        <span>More</span>
                       </div>
-                      <span>More</span>
+                      {!loadingContributions && contributions.length > 0 && (
+                        <div className="pt-2 border-t border-primary/10">
+                          <div className="flex items-center justify-between text-[10px] text-gray-400 font-mono">
+                            <span>Active days:</span>
+                            <span className="text-primary">
+                              {contributions.filter(c => c.count > 0).length} / {contributions.length}
+                            </span>
+                          </div>
+                          {(() => {
+                            const maxContributions = Math.max(...contributions.map(c => c.count))
+                            const maxDay = contributions.find(c => c.count === maxContributions)
+                            if (maxDay && maxContributions > 0) {
+                              const date = new Date(maxDay.date)
+                              return (
+                                <div className="flex items-center justify-between text-[10px] text-gray-400 font-mono mt-1">
+                                  <span>Best day:</span>
+                                  <span className="text-primary">
+                                    {maxContributions} on {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                  </span>
+                                </div>
+                              )
+                            }
+                            return null
+                          })()}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
