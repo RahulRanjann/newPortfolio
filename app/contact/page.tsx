@@ -17,10 +17,300 @@ declare global {
   }
 }
 
+// Success Animation Component
+function SuccessAnimation({ onComplete }: { onComplete: () => void }) {
+  const [phase, setPhase] = useState(0)
+  const [typedText, setTypedText] = useState("")
+  const successMessages = [
+    "> INITIALIZING SECURE CHANNEL...",
+    "> ENCRYPTING PAYLOAD [AES-256]...",
+    "> TRANSMISSION SUCCESSFUL ✓",
+    "> MESSAGE DELIVERED TO TARGET",
+  ]
+
+  useEffect(() => {
+    const phaseTimers = [
+      setTimeout(() => setPhase(1), 300),
+      setTimeout(() => setPhase(2), 800),
+      setTimeout(() => setPhase(3), 1500),
+      setTimeout(() => setPhase(4), 2200),
+      setTimeout(() => setPhase(5), 3000),
+      setTimeout(() => onComplete(), 4500),
+    ]
+    return () => phaseTimers.forEach(clearTimeout)
+  }, [onComplete])
+
+  useEffect(() => {
+    if (phase >= 1 && phase <= 4) {
+      const message = successMessages[phase - 1]
+      let index = 0
+      setTypedText("")
+      const typeInterval = setInterval(() => {
+        if (index < message.length) {
+          setTypedText(message.slice(0, index + 1))
+          index++
+        } else {
+          clearInterval(typeInterval)
+        }
+      }, 25)
+      return () => clearInterval(typeInterval)
+    }
+  }, [phase])
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
+      {/* Dark overlay with fade in */}
+      <div 
+        className="absolute inset-0 bg-black/95 backdrop-blur-sm"
+        style={{ animation: "fadeIn 0.3s ease-out" }}
+      />
+      
+      {/* Scan lines effect */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(34,197,94,0.03) 2px, rgba(34,197,94,0.03) 4px)",
+          animation: "scanlines 8s linear infinite",
+        }}
+      />
+      
+      {/* Grid background */}
+      <div 
+        className="absolute inset-0 opacity-10"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(34,197,94,0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(34,197,94,0.3) 1px, transparent 1px)
+          `,
+          backgroundSize: "50px 50px",
+          animation: "gridPulse 2s ease-in-out infinite",
+        }}
+      />
+
+      {/* Main content container */}
+      <div 
+        className="relative z-10 max-w-lg w-full mx-4 p-8 border border-primary/30 rounded-lg bg-black/80"
+        style={{ 
+          boxShadow: "0 0 60px rgba(34,197,94,0.3), inset 0 0 60px rgba(34,197,94,0.05)",
+          animation: "containerGlow 2s ease-in-out infinite alternate",
+        }}
+      >
+        {/* Terminal header */}
+        <div className="flex items-center gap-2 mb-6 pb-4 border-b border-primary/20">
+          <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+          <div className="w-3 h-3 rounded-full bg-yellow-500 animate-pulse" style={{ animationDelay: "0.2s" }} />
+          <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" style={{ animationDelay: "0.4s" }} />
+          <span className="ml-2 text-xs text-gray-500 font-mono">transmission_status.log</span>
+        </div>
+
+        {/* Success icon with glitch effect */}
+        {phase >= 3 && (
+          <div 
+            className="flex justify-center mb-6"
+            style={{ animation: "glitchIn 0.5s ease-out" }}
+          >
+            <div 
+              className="relative w-24 h-24 rounded-full border-2 border-primary flex items-center justify-center"
+              style={{ 
+                boxShadow: "0 0 30px rgba(34,197,94,0.5), inset 0 0 30px rgba(34,197,94,0.2)",
+                animation: "iconPulse 1.5s ease-in-out infinite",
+              }}
+            >
+              <svg 
+                className="w-12 h-12 text-primary" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+                style={{ animation: "checkDraw 0.6s ease-out forwards" }}
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={3} 
+                  d="M5 13l4 4L19 7"
+                  style={{
+                    strokeDasharray: 30,
+                    strokeDashoffset: 30,
+                    animation: "drawCheck 0.6s ease-out 0.2s forwards",
+                  }}
+                />
+              </svg>
+              
+              {/* Glitch copies */}
+              <div 
+                className="absolute inset-0 rounded-full border-2 border-cyan-400 opacity-50"
+                style={{ animation: "glitchCopy1 0.3s ease-in-out infinite" }}
+              />
+              <div 
+                className="absolute inset-0 rounded-full border-2 border-red-400 opacity-30"
+                style={{ animation: "glitchCopy2 0.3s ease-in-out infinite" }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Terminal output */}
+        <div className="font-mono text-sm space-y-2 mb-6">
+          {successMessages.slice(0, phase).map((msg, i) => (
+            <div 
+              key={i} 
+              className={`${i === phase - 1 ? "text-primary" : "text-gray-500"}`}
+              style={{ animation: i === phase - 1 ? "textGlow 0.5s ease-out" : undefined }}
+            >
+              {i === phase - 1 ? typedText : msg}
+              {i === phase - 1 && <span className="animate-blink">|</span>}
+            </div>
+          ))}
+        </div>
+
+        {/* Success title with glitch */}
+        {phase >= 5 && (
+          <div className="text-center" style={{ animation: "fadeSlideUp 0.5s ease-out" }}>
+            <h2 
+              className="text-2xl font-black text-white mb-2 relative inline-block"
+              style={{ animation: "glitchText 3s infinite" }}
+            >
+              TRANSMISSION_COMPLETE
+              <span 
+                className="absolute inset-0 text-cyan-400 opacity-70"
+                style={{ animation: "glitchOffset1 0.3s infinite" }}
+              >
+                TRANSMISSION_COMPLETE
+              </span>
+              <span 
+                className="absolute inset-0 text-red-400 opacity-50"
+                style={{ animation: "glitchOffset2 0.3s infinite" }}
+              >
+                TRANSMISSION_COMPLETE
+              </span>
+            </h2>
+            <p className="text-gray-400 text-sm">
+              Response latency: &lt; 24h
+            </p>
+          </div>
+        )}
+
+        {/* Progress bar */}
+        <div className="mt-6 h-1 bg-gray-800 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-primary via-cyan-400 to-primary rounded-full"
+            style={{ 
+              width: `${(phase / 5) * 100}%`,
+              transition: "width 0.5s ease-out",
+              boxShadow: "0 0 10px rgba(34,197,94,0.8)",
+            }}
+          />
+        </div>
+
+        {/* Floating particles */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-primary rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                opacity: Math.random() * 0.7 + 0.3,
+                animation: `particleFloat ${2 + Math.random() * 3}s ease-in-out infinite`,
+                animationDelay: `${Math.random() * 2}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Corner decorations */}
+      <div className="absolute top-4 left-4 w-16 h-16 border-l-2 border-t-2 border-primary/50" style={{ animation: "cornerPulse 2s infinite" }} />
+      <div className="absolute top-4 right-4 w-16 h-16 border-r-2 border-t-2 border-primary/50" style={{ animation: "cornerPulse 2s infinite 0.5s" }} />
+      <div className="absolute bottom-4 left-4 w-16 h-16 border-l-2 border-b-2 border-primary/50" style={{ animation: "cornerPulse 2s infinite 1s" }} />
+      <div className="absolute bottom-4 right-4 w-16 h-16 border-r-2 border-b-2 border-primary/50" style={{ animation: "cornerPulse 2s infinite 1.5s" }} />
+
+      {/* Inject keyframes */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scanlines {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(4px); }
+        }
+        @keyframes gridPulse {
+          0%, 100% { opacity: 0.1; }
+          50% { opacity: 0.2; }
+        }
+        @keyframes containerGlow {
+          from { box-shadow: 0 0 60px rgba(34,197,94,0.2), inset 0 0 60px rgba(34,197,94,0.03); }
+          to { box-shadow: 0 0 80px rgba(34,197,94,0.4), inset 0 0 80px rgba(34,197,94,0.08); }
+        }
+        @keyframes glitchIn {
+          0% { transform: scale(0.8) translateX(-10px); opacity: 0; filter: blur(10px); }
+          50% { transform: scale(1.05) translateX(5px); filter: blur(2px); }
+          100% { transform: scale(1) translateX(0); opacity: 1; filter: blur(0); }
+        }
+        @keyframes iconPulse {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(34,197,94,0.5), inset 0 0 30px rgba(34,197,94,0.2); }
+          50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(34,197,94,0.7), inset 0 0 50px rgba(34,197,94,0.3); }
+        }
+        @keyframes drawCheck {
+          to { stroke-dashoffset: 0; }
+        }
+        @keyframes glitchCopy1 {
+          0%, 100% { transform: translate(0, 0); }
+          25% { transform: translate(-2px, 1px); }
+          75% { transform: translate(2px, -1px); }
+        }
+        @keyframes glitchCopy2 {
+          0%, 100% { transform: translate(0, 0); }
+          25% { transform: translate(2px, -1px); }
+          75% { transform: translate(-2px, 1px); }
+        }
+        @keyframes textGlow {
+          from { text-shadow: 0 0 20px rgba(34,197,94,0.8); }
+          to { text-shadow: 0 0 5px rgba(34,197,94,0.5); }
+        }
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glitchText {
+          0%, 90%, 100% { transform: translate(0); }
+          92% { transform: translate(-2px, 1px); }
+          94% { transform: translate(2px, -1px); }
+          96% { transform: translate(-1px, -1px); }
+          98% { transform: translate(1px, 1px); }
+        }
+        @keyframes glitchOffset1 {
+          0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+          25% { clip-path: inset(10% 0 60% 0); transform: translate(-2px, 0); }
+          50% { clip-path: inset(40% 0 20% 0); transform: translate(2px, 0); }
+          75% { clip-path: inset(70% 0 10% 0); transform: translate(-1px, 0); }
+        }
+        @keyframes glitchOffset2 {
+          0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+          25% { clip-path: inset(60% 0 10% 0); transform: translate(2px, 0); }
+          50% { clip-path: inset(20% 0 40% 0); transform: translate(-2px, 0); }
+          75% { clip-path: inset(10% 0 70% 0); transform: translate(1px, 0); }
+        }
+        @keyframes particleFloat {
+          0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+          50% { transform: translateY(-20px) scale(1.5); opacity: 0.8; }
+        }
+        @keyframes cornerPulse {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
+        }
+      `}</style>
+    </div>
+  )
+}
+
 export default function Contact() {
   const [showContent, setShowContent] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const headingTyping = useTypeWriter("ESTABLISH_CONNECTION_", 40, 0)
 
@@ -148,7 +438,7 @@ export default function Contact() {
       // EmailJS v3 returns { status: 200, text: "OK" } on success
       if (response && response.status === 200 && response.text === "OK") {
         setSubmitStatus("success")
-        alert("Message sent successfully!")
+        setShowSuccessAnimation(true)
         
         // Reset form
         if (formRef.current) {
@@ -218,7 +508,14 @@ export default function Contact() {
     }
   }
 
+  const handleAnimationComplete = () => {
+    setShowSuccessAnimation(false)
+    setSubmitStatus("idle")
+  }
+
   return (
+    <>
+    {showSuccessAnimation && <SuccessAnimation onComplete={handleAnimationComplete} />}
     <main className="relative min-h-screen pt-24 pb-12">
       {/* Background */}
       <div className="absolute inset-0 cyber-grid opacity-20 pointer-events-none" />
@@ -382,5 +679,6 @@ export default function Contact() {
         )}
       </div>
     </main>
+    </>
   )
 }
