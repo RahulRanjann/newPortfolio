@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTypeWriter } from "@/hooks/use-typewriter"
 
 interface Project {
   id: string
@@ -17,7 +18,18 @@ interface Project {
 }
 
 export default function Projects() {
+  const [showContent, setShowContent] = useState(false)
   const [activeFilter, setActiveFilter] = useState("all")
+  const headingTyping = useTypeWriter("SELECTED_WORKS_", 40, 0)
+
+  useEffect(() => {
+    if (headingTyping.isComplete) {
+      const timer = setTimeout(() => {
+        setShowContent(true)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [headingTyping.isComplete])
 
   const projects: Project[] = [
     {
@@ -120,17 +132,27 @@ export default function Projects() {
           <div className="inline-block mb-4">
             <p className="text-sm font-mono text-primary/70 uppercase tracking-wider">• SYSTEM_MODULES</p>
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-            SELECTED_WORKS<span className="text-primary">_</span>
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 min-h-[60px] md:min-h-[80px]">
+            {headingTyping.displayedText ? (
+              <>
+                {headingTyping.displayedText}
+                {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+              </>
+            ) : (
+              <span className="animate-blink">|</span>
+            )}
           </h1>
-          <p className="text-gray-400 max-w-2xl">
-            A collection of deployed applications and experiments. Each module represents a specific problem solved
-            through code.
-          </p>
+          {showContent && (
+            <p className="text-gray-400 max-w-2xl animate-fade-in">
+              A collection of deployed applications and experiments. Each module represents a specific problem solved
+              through code.
+            </p>
+          )}
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-3 mb-12">
+        {showContent && (
+          <div className="flex flex-wrap gap-3 mb-12 animate-fade-in">
           {filters.map((filter) => (
             <button
               key={filter.id}
@@ -144,10 +166,13 @@ export default function Projects() {
               {filter.label}
             </button>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {showContent && (
+          <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
           {filtered.map((project) => (
             <div
               key={project.id}
@@ -208,12 +233,14 @@ export default function Projects() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
 
-        {/* Load More */}
-        <div className="mt-12 text-center">
-          <button className="font-mono text-primary hover:text-white transition-colors">Load_More_Modules() ↓</button>
-        </div>
+          {/* Load More */}
+          <div className="mt-12 text-center">
+            <button className="font-mono text-primary hover:text-white transition-colors">Load_More_Modules() ↓</button>
+          </div>
+          </>
+        )}
       </div>
     </main>
   )

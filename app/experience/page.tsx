@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTypeWriter } from "@/hooks/use-typewriter"
 
 interface Experience {
   title: string
@@ -13,8 +14,58 @@ interface Experience {
   isActive?: boolean
 }
 
+interface Contribution {
+  date: string
+  count: number
+}
+
 export default function Experience() {
+  const [showContent, setShowContent] = useState(false)
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0)
+  const [contributions, setContributions] = useState<Contribution[]>([])
+  const [loadingContributions, setLoadingContributions] = useState(true)
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
+  const headingTyping = useTypeWriter("run experience.exe _", 40, 0)
+
+  useEffect(() => {
+    if (headingTyping.isComplete) {
+      const timer = setTimeout(() => {
+        setShowContent(true)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [headingTyping.isComplete])
+
+  useEffect(() => {
+    // Fetch GitHub contributions
+    const fetchContributions = async () => {
+      setLoadingContributions(true)
+      try {
+        const response = await fetch(`/api/github-contributions?year=${selectedYear}&month=${selectedMonth}`)
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const data = await response.json()
+        console.log('Fetched contributions:', data)
+        if (data.contributions && Array.isArray(data.contributions)) {
+          setContributions(data.contributions)
+        } else {
+          console.warn('No contributions found or invalid format:', data)
+          setContributions([])
+        }
+      } catch (error) {
+        console.error('Error fetching contributions:', error)
+        setContributions([])
+      } finally {
+        setLoadingContributions(false)
+      }
+    }
+    
+    if (showContent) {
+      fetchContributions()
+    }
+  }, [showContent, selectedYear, selectedMonth])
 
   const experiences: Experience[] = [
     {
@@ -94,40 +145,65 @@ export default function Experience() {
           <div className="inline-block mb-4">
             <p className="text-sm font-mono text-primary/70">&gt; SYSTEM_EXECUTION</p>
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white">
-            run <span className="text-primary">experience.exe</span> _
+          <h1 className="text-4xl md:text-6xl font-black text-white min-h-[60px] md:min-h-[80px]">
+            {headingTyping.displayedText ? (
+              <>
+                {headingTyping.displayedText.includes("experience.exe") ? (
+                  <>
+                    {headingTyping.displayedText.split("experience.exe")[0]}
+                    <span className="text-primary">experience.exe</span>
+                    {headingTyping.displayedText.split("experience.exe")[1]}
+                    {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+                  </>
+                ) : (
+                  <>
+                    {headingTyping.displayedText}
+                    {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+                  </>
+                )}
+              </>
+            ) : (
+              <span className="animate-blink">|</span>
+            )}
           </h1>
-          <p className="text-gray-400 font-mono text-sm mt-4">
+          {showContent && (
+            <p className="text-gray-400 font-mono text-sm mt-4 animate-fade-in">
             Initializing System Logs: Retrieving career history data blocks... Status: Loaded successfully.
           </p>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {showContent && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in">
           {/* Timeline */}
           <div className="lg:col-span-2">
-            <div className="relative">
+            <div className="relative pl-4">
               {/* Vertical Line */}
-              <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-primary/50 to-transparent" />
+              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent" />
 
               {/* Experience Items */}
               <div className="space-y-8">
                 {experiences.map((exp, idx) => (
                   <div
                     key={idx}
-                    className="cursor-pointer"
+                    className="cursor-pointer relative"
                     onClick={() => setExpandedIndex(expandedIndex === idx ? null : idx)}
                   >
                     {/* Timeline Dot */}
                     <div className="flex items-start gap-6">
-                      <div className="relative mt-1">
+                      <div className="relative z-10 flex-shrink-0">
                         <div
                           className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${
                             exp.isActive
-                              ? "border-primary bg-primary/20 shadow-[0_0_15px_rgba(0,255,157,0.4)]"
+                              ? "border-primary bg-primary/20 shadow-[0_0_15px_rgba(0,255,157,0.4)] animate-pulse"
                               : "border-primary/40 bg-muted hover:border-primary"
                           }`}
                         >
-                          <span className="text-xl">⬤</span>
+                          {exp.isActive ? (
+                            <span className="w-3 h-3 bg-primary rounded-full shadow-[0_0_8px_rgba(0,255,157,0.8)]" />
+                          ) : (
+                            <span className="w-2 h-2 bg-primary/60 rounded-full" />
+                          )}
                         </div>
                       </div>
 
@@ -241,25 +317,194 @@ export default function Experience() {
                   </div>
                 </div>
 
-                {/* Activity Log */}
+                {/* Activity Log - GitHub Style (1 Month) */}
                 <div className="pt-6 border-t border-primary/10">
-                  <p className="text-xs text-gray-500 uppercase font-mono tracking-wider mb-4">ACTIVITY_LOG</p>
-                  <div className="flex gap-1">
-                    {Array(24)
-                      .fill(0)
-                      .map((_, i) => (
-                        <div
-                          key={i}
-                          className="flex-1 h-6 bg-muted rounded border border-primary/20 hover:border-primary hover:bg-primary/20 transition-all cursor-pointer"
-                          title={`Activity day ${i}`}
-                        />
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-xs text-gray-500 uppercase font-mono tracking-wider">ACTIVITY_LOG</p>
+                    {/* Year and Month Selectors */}
+                    <div className="flex gap-2">
+                      <select
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                        className="px-2 py-1 text-xs bg-muted border border-primary/30 rounded text-primary font-mono hover:border-primary transition-colors focus:outline-none focus:border-primary"
+                      >
+                        {Array.from({ length: 5 }, (_, i) => {
+                          const year = new Date().getFullYear() - i
+                          return (
+                            <option key={year} value={year} className="bg-muted text-white">
+                              {year}
+                            </option>
+                          )
+                        })}
+                      </select>
+                      <select
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                        className="px-2 py-1 text-xs bg-muted border border-primary/30 rounded text-primary font-mono hover:border-primary transition-colors focus:outline-none focus:border-primary"
+                      >
+                        {[
+                          'January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December'
+                        ].map((month, index) => (
+                          <option key={index + 1} value={index + 1} className="bg-muted text-white">
+                            {month}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {/* Month label */}
+                    <div className="text-[10px] text-gray-500 font-mono mb-1">
+                      {new Date(selectedYear, selectedMonth - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    </div>
+                    
+                    {/* Weekday labels */}
+                    <div className="grid grid-cols-7 gap-1 mb-1">
+                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => (
+                        <div key={i} className="text-[9px] text-gray-600 font-mono text-center">
+                          {i % 2 === 0 ? day : ''}
+                        </div>
                       ))}
+                    </div>
+                    
+                    {/* GitHub-style contribution graph - 1 month */}
+                    {loadingContributions ? (
+                      <div className="grid grid-cols-7 gap-1">
+                        {Array.from({ length: 35 }, (_, i) => (
+                          <div key={i} className="h-3 w-3 rounded-sm bg-muted border border-primary/10 animate-pulse" />
+                        ))}
+                      </div>
+                    ) : contributions.length === 0 ? (
+                      <div className="text-center py-4">
+                        <p className="text-xs text-gray-500 font-mono">No contribution data available for this month</p>
+                        <div className="grid grid-cols-7 gap-1 mt-2">
+                          {(() => {
+                            const firstDay = new Date(selectedYear, selectedMonth - 1, 1)
+                            const lastDay = new Date(selectedYear, selectedMonth, 0)
+                            const daysInMonth = lastDay.getDate()
+                            const startDayOfWeek = firstDay.getDay()
+                            const gridDays: (Date | null)[] = []
+                            
+                            for (let i = 0; i < startDayOfWeek; i++) {
+                              gridDays.push(null)
+                            }
+                            
+                            for (let day = 1; day <= daysInMonth; day++) {
+                              gridDays.push(new Date(selectedYear, selectedMonth - 1, day))
+                            }
+                            
+                            return gridDays.map((date, i) => (
+                              <div key={i} className={`h-3 w-3 rounded-sm border ${date ? 'bg-muted border-primary/10' : ''}`} />
+                            ))
+                          })()}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-7 gap-1">
+                        {(() => {
+                          // Get first day of selected month
+                          const firstDay = new Date(selectedYear, selectedMonth - 1, 1)
+                          const lastDay = new Date(selectedYear, selectedMonth, 0)
+                          const daysInMonth = lastDay.getDate()
+                          
+                          // Get day of week for first day (0 = Sunday, 6 = Saturday)
+                          const startDayOfWeek = firstDay.getDay()
+                          
+                          // Create array for all days in the grid (including empty cells for days before month starts)
+                          const gridDays: (Date | null)[] = []
+                          
+                          // Add empty cells for days before month starts
+                          for (let i = 0; i < startDayOfWeek; i++) {
+                            gridDays.push(null)
+                          }
+                          
+                          // Add all days in the month
+                          for (let day = 1; day <= daysInMonth; day++) {
+                            gridDays.push(new Date(selectedYear, selectedMonth - 1, day))
+                          }
+                          
+                          return gridDays.map((date, i) => {
+                            if (!date) {
+                              return <div key={i} className="h-3 w-3" /> // Empty cell
+                            }
+                            
+                            // Format date as YYYY-MM-DD (handle timezone issues)
+                            const year = date.getFullYear()
+                            const month = String(date.getMonth() + 1).padStart(2, '0')
+                            const day = String(date.getDate()).padStart(2, '0')
+                            const dateString = `${year}-${month}-${day}`
+                          
+                          // Find contribution for this date (try exact match and also check if date string contains the date)
+                          const contribution = contributions.find(c => {
+                            if (!c.date) return false
+                            const contribDate = c.date.split('T')[0] // Remove time if present
+                            return contribDate === dateString
+                          })
+                          const count = contribution?.count || 0
+                          
+                          // Map count to activity level (0-4)
+                          const getActivityLevel = (count: number): number => {
+                            if (count === 0) return 0
+                            if (count <= 2) return 1
+                            if (count <= 5) return 2
+                            if (count <= 10) return 3
+                            return 4
+                          }
+                          
+                          const activityLevel = getActivityLevel(count)
+                          
+                          const getColor = (level: number) => {
+                            switch (level) {
+                              case 0: return 'bg-muted border-primary/10'
+                              case 1: return 'bg-primary/20 border-primary/30'
+                              case 2: return 'bg-primary/40 border-primary/50'
+                              case 3: return 'bg-primary/60 border-primary/70'
+                              case 4: return 'bg-primary border-primary'
+                              default: return 'bg-muted border-primary/10'
+                            }
+                          }
+
+                            return (
+                              <div
+                                key={i}
+                                className={`h-3 w-3 rounded-sm border ${getColor(activityLevel)} hover:border-primary hover:scale-125 transition-all cursor-pointer group relative`}
+                                title={`${count} ${count === 1 ? 'contribution' : 'contributions'} on ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+                              >
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-muted border border-primary/50 rounded text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none z-20 transition-opacity">
+                                  <div className="font-mono">
+                                    {count} {count === 1 ? 'contribution' : 'contributions'}
+                                  </div>
+                                  <div className="text-gray-400 text-[10px] mt-0.5">
+                                    {date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                  </div>
+                                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 bg-muted border-r border-b border-primary/50 rotate-45" />
+                                </div>
+                              </div>
+                            )
+                          })
+                        })()}
+                      </div>
+                    )}
+                    {/* Legend */}
+                    <div className="flex items-center justify-between text-[10px] text-gray-500 font-mono mt-3">
+                      <span>Less</span>
+                      <div className="flex gap-1">
+                        <div className="w-3 h-3 rounded-sm bg-muted border border-primary/10" />
+                        <div className="w-3 h-3 rounded-sm bg-primary/20 border border-primary/30" />
+                        <div className="w-3 h-3 rounded-sm bg-primary/40 border border-primary/50" />
+                        <div className="w-3 h-3 rounded-sm bg-primary/60 border border-primary/70" />
+                        <div className="w-3 h-3 rounded-sm bg-primary border border-primary" />
+                      </div>
+                      <span>More</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        )}
       </div>
     </main>
   )

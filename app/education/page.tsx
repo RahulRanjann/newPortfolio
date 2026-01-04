@@ -1,4 +1,20 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useTypeWriter } from "@/hooks/use-typewriter"
+
 export default function Education() {
+  const [showContent, setShowContent] = useState(false)
+  const headingTyping = useTypeWriter("//EDUCATION", 40, 0)
+
+  useEffect(() => {
+    if (headingTyping.isComplete) {
+      const timer = setTimeout(() => {
+        setShowContent(true)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [headingTyping.isComplete])
   const educationItems = [
     {
       icon: "🎓",
@@ -39,16 +55,37 @@ export default function Education() {
           <div className="inline-block mb-4">
             <p className="text-sm font-mono text-primary/70 uppercase tracking-wider">02. SYSTEM_LOG</p>
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-            <span className="text-primary">//</span>EDUCATION
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 min-h-[60px] md:min-h-[80px]">
+            {headingTyping.displayedText ? (
+              <>
+                {headingTyping.displayedText.includes("//") ? (
+                  <>
+                    <span className="text-primary">//</span>
+                    {headingTyping.displayedText.replace("//", "")}
+                    {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+                  </>
+                ) : (
+                  <>
+                    {headingTyping.displayedText}
+                    {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+                  </>
+                )}
+              </>
+            ) : (
+              <span className="animate-blink">|</span>
+            )}
           </h1>
-          <p className="text-gray-400">
-            Compiling academic background and certification history. Initialize timeline sequence.
-          </p>
+          {showContent && (
+            <p className="text-gray-400 animate-fade-in">
+              Compiling academic background and certification history. Initialize timeline sequence.
+            </p>
+          )}
         </div>
 
         {/* Timeline */}
-        <div className="relative">
+        {showContent && (
+          <>
+          <div className="relative animate-fade-in">
           {/* Vertical Line */}
           <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-primary/50 to-transparent" />
 
@@ -118,6 +155,8 @@ export default function Education() {
             </a>
           </div>
         </div>
+        </>
+        )}
       </div>
     </main>
   )

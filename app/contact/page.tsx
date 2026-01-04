@@ -1,14 +1,26 @@
 "use client"
 
-import { type FormEvent, useState } from "react"
+import { type FormEvent, useState, useEffect } from "react"
+import { useTypeWriter } from "@/hooks/use-typewriter"
 
 export default function Contact() {
+  const [showContent, setShowContent] = useState(false)
   const [formState, setFormState] = useState({
     name: "",
     email: "",
     topic: "",
     message: "",
   })
+  const headingTyping = useTypeWriter("ESTABLISH_CONNECTION_", 40, 0)
+
+  useEffect(() => {
+    if (headingTyping.isComplete) {
+      const timer = setTimeout(() => {
+        setShowContent(true)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [headingTyping.isComplete])
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -27,17 +39,38 @@ export default function Contact() {
           <div className="inline-block mb-4">
             <p className="text-sm font-mono text-primary/70 uppercase tracking-wider">ROOT_ACCESS</p>
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-            ESTABLISH_<span className="text-primary">CONNECTION</span>_
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 min-h-[60px] md:min-h-[80px]">
+            {headingTyping.displayedText ? (
+              <>
+                {headingTyping.displayedText.includes("CONNECTION") ? (
+                  <>
+                    {headingTyping.displayedText.split("CONNECTION")[0]}
+                    <span className="text-primary">CONNECTION</span>
+                    {headingTyping.displayedText.split("CONNECTION")[1]}
+                    {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+                  </>
+                ) : (
+                  <>
+                    {headingTyping.displayedText}
+                    {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+                  </>
+                )}
+              </>
+            ) : (
+              <span className="animate-blink">|</span>
+            )}
           </h1>
-          <p className="text-gray-400 max-w-2xl">
-            Secure channel open. Input your parameters below to initialize communication protocol. Response latency:
-            &lt; 24h.
-          </p>
+          {showContent && (
+            <p className="text-gray-400 max-w-2xl animate-fade-in">
+              Secure channel open. Input your parameters below to initialize communication protocol. Response latency:
+              &lt; 24h.
+            </p>
+          )}
         </div>
 
         {/* Contact Container */}
-        <div className="border border-primary/20 rounded-lg overflow-hidden bg-muted/30 box-glow">
+        {showContent && (
+          <div className="border border-primary/20 rounded-lg overflow-hidden bg-muted/30 box-glow animate-fade-in">
           {/* Terminal Header */}
           <div className="flex items-center gap-3 px-6 py-4 border-b border-primary/20 bg-muted/50">
             <div className="flex gap-2">
@@ -154,6 +187,7 @@ export default function Contact() {
             </button>
           </div>
         </div>
+        )}
       </div>
     </main>
   )

@@ -2,10 +2,10 @@ import Link from "next/link"
 
 export default function Footer() {
   return (
-    <footer className="border-t border-primary/10 bg-muted py-8">
+    <footer className="border-t border-primary/20 bg-muted/50 py-8 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 md:px-10 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="text-gray-500 text-sm font-mono">
-          © 2026 Rahul_Ranjan. <span className="text-primary/50">All systems operational.</span>
+        <div className="text-gray-400 text-sm font-mono">
+          <span className="text-primary/70">//</span> © 2026 Rahul_Ranjan. <span className="text-primary/60">[STATUS: OPERATIONAL]</span>
         </div>
         <div className="flex items-center gap-6">
           <Link

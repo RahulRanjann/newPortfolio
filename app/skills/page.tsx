@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTypeWriter } from "@/hooks/use-typewriter"
 
 interface Skill {
   name: string
@@ -15,7 +16,22 @@ interface SkillCategory {
 }
 
 export default function Skills() {
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null)
+  const [showContent, setShowContent] = useState(false)
+  const [animateProgress, setAnimateProgress] = useState(false)
+  const headingTyping = useTypeWriter("SYSTEM_CAPABILITIES // SKILLS", 40, 0)
+
+  useEffect(() => {
+    if (headingTyping.isComplete) {
+      const timer = setTimeout(() => {
+        setShowContent(true)
+        // Start progress animations after content is shown
+        setTimeout(() => {
+          setAnimateProgress(true)
+        }, 200)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [headingTyping.isComplete])
 
   const skillCategories: SkillCategory[] = [
     {
@@ -84,22 +100,44 @@ export default function Skills() {
           <div className="inline-block mb-4 px-3 py-1 border border-primary/30 rounded text-xs text-primary font-mono tracking-wider uppercase">
             • SYSTEM_LOG
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white">
-            SYSTEM_CAPABILITIES <span className="text-primary">// SKILLS</span>
+          <h1 className="text-4xl md:text-6xl font-black text-white min-h-[60px] md:min-h-[80px]">
+            {headingTyping.displayedText ? (
+              <>
+                {headingTyping.displayedText.includes("//") ? (
+                  <>
+                    {headingTyping.displayedText.split("//")[0]}
+                    <span className="text-primary">// {headingTyping.displayedText.split("//")[1] || ""}</span>
+                    {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+                  </>
+                ) : (
+                  <>
+                    {headingTyping.displayedText}
+                    {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+                  </>
+                )}
+              </>
+            ) : (
+              <span className="animate-blink">|</span>
+            )}
           </h1>
-          <p className="text-gray-400 font-mono text-sm mt-4">
-            root@user:~$ executing ./show_skills.sh --verbose --visualize
-          </p>
+          {showContent && (
+            <p className="text-gray-400 font-mono text-sm mt-4 animate-fade-in">
+              root@user:~$ executing ./show_skills.sh --verbose --visualize
+            </p>
+          )}
         </div>
 
         {/* Skills Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {showContent && (
+          <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
           {skillCategories.map((category, idx) => (
             <div
               key={idx}
-              className="border border-primary/20 rounded-lg p-6 bg-muted/50 backdrop-blur-sm hover:border-primary/60 transition-all duration-300 box-glow"
-              onMouseEnter={() => setHoveredCard(idx)}
-              onMouseLeave={() => setHoveredCard(null)}
+              className="border border-primary/20 rounded-lg p-6 bg-muted/50 backdrop-blur-sm hover:border-primary/60 transition-all duration-300 box-glow animate-slide-up"
+              style={{
+                animationDelay: `${idx * 100}ms`,
+              }}
             >
               {/* Card Header */}
               <div className="flex items-center justify-between mb-4">
@@ -126,12 +164,16 @@ export default function Skills() {
                             fill="none"
                             stroke="#00ff9d"
                             strokeWidth="3"
-                            strokeDasharray={`${2.827 * skill.percentage} ${282.7}`}
-                            className="transition-all duration-500"
+                            strokeDasharray="282.7"
+                            strokeDashoffset={animateProgress ? `${282.7 - (282.7 * skill.percentage / 100)}` : "282.7"}
+                            className="transition-all duration-1000 ease-out"
+                            strokeLinecap="round"
                           />
                         </svg>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-sm font-bold text-primary">{skill.percentage}%</span>
+                          <span className="text-sm font-bold text-primary transition-opacity duration-500" style={{ opacity: animateProgress ? 1 : 0 }}>
+                            {skill.percentage}%
+                          </span>
                         </div>
                       </div>
                       <p className="text-xs text-gray-400 text-center">{skill.name}</p>
@@ -142,16 +184,18 @@ export default function Skills() {
                 /* Linear Progress Bars */
                 <div className="space-y-4">
                   {category.skills.map((skill, i) => (
-                    <div key={i}>
+                    <div key={i} style={{ animationDelay: `${(idx * 100) + (i * 50)}ms` }}>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm text-gray-300">{skill.name}</span>
-                        <span className="text-xs text-primary font-bold">{skill.percentage}%</span>
+                        <span className="text-xs text-primary font-bold transition-opacity duration-500" style={{ opacity: animateProgress ? 1 : 0 }}>
+                          {skill.percentage}%
+                        </span>
                       </div>
                       <div className="h-2 bg-muted rounded overflow-hidden border border-primary/20">
                         <div
-                          className="h-full bg-primary transition-all duration-500 ease-out"
+                          className="h-full bg-primary transition-all duration-1000 ease-out"
                           style={{
-                            width: hoveredCard === idx ? `${skill.percentage}%` : "0%",
+                            width: animateProgress ? `${skill.percentage}%` : "0%",
                           }}
                         />
                       </div>
@@ -161,14 +205,16 @@ export default function Skills() {
               )}
             </div>
           ))}
-        </div>
+          </div>
 
-        {/* Footer Note */}
-        <div className="mt-12 border-t border-primary/10 pt-8">
-          <p className="text-sm text-gray-500 font-mono text-center">
-            // Hover over items to view detailed diagnostics ... Status: All modules online
-          </p>
-        </div>
+          {/* Footer Note */}
+          <div className="mt-12 border-t border-primary/10 pt-8">
+            <p className="text-sm text-gray-500 font-mono text-center">
+              // All modules loaded and operational ... Status: All systems online
+            </p>
+          </div>
+          </>
+        )}
       </div>
     </main>
   )

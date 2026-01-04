@@ -115,23 +115,79 @@
 /* Added cyber grid background pattern */
 .cyber-grid {
   background-size: 40px 40px;
-  background-image: linear-gradient(to right, rgba(0, 255, 157, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 255, 157, 0.03) 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(0, 255, 157, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 157, 0.05) 1px, transparent 1px);
   mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
   -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
 }
 
+/* Matrix rain effect */
+.matrix-rain {
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 157, 0.03) 2px,
+      rgba(0, 255, 157, 0.03) 4px
+    );
+  animation: matrix-fall 20s linear infinite;
+}
+
+@keyframes matrix-fall {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100vh;
+  }
+}
+
+/* Terminal scan lines */
+.scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  animation: scanline-move 8s linear infinite;
+}
+
+@keyframes scanline-move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100vh;
+  }
+}
+
 /* Added neon glow effects */
 .text-glow {
-  text-shadow: 0 0 10px rgba(0, 255, 157, 0.5), 0 0 20px rgba(0, 255, 157, 0.3);
+  text-shadow: 
+    0 0 10px rgba(0, 255, 157, 0.6),
+    0 0 20px rgba(0, 255, 157, 0.4),
+    0 0 30px rgba(0, 255, 157, 0.2),
+    0 0 40px rgba(0, 255, 157, 0.1);
 }
 
 .box-glow {
-  box-shadow: 0 0 15px rgba(0, 255, 157, 0.15);
+  box-shadow: 
+    0 0 15px rgba(0, 255, 157, 0.2),
+    0 0 30px rgba(0, 255, 157, 0.1),
+    inset 0 0 15px rgba(0, 255, 157, 0.05);
+  transition: all 0.3s ease;
 }
 
 .box-glow:hover {
-  box-shadow: 0 0 25px rgba(0, 255, 157, 0.4);
+  box-shadow: 
+    0 0 25px rgba(0, 255, 157, 0.5),
+    0 0 50px rgba(0, 255, 157, 0.3),
+    inset 0 0 20px rgba(0, 255, 157, 0.1);
+  transform: translateY(-2px);
 }
 
 /* Added typing animation */
@@ -156,9 +212,244 @@
   from,
   to {
     border-color: transparent;
+    opacity: 1;
   }
   50% {
     border-color: #00ff9d;
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: cursor-blink 1s step-end infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-in;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Binary rain effect */
+.binary-rain {
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 157, 0.02) 2px,
+      rgba(0, 255, 157, 0.02) 4px
+    );
+  animation: binary-fall 15s linear infinite;
+}
+
+@keyframes binary-fall {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100vh;
+  }
+}
+
+/* Glitch text effect */
+.glitch-text {
+  position: relative;
+}
+
+.glitch-text-inner {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-text:hover .glitch-text-inner {
+  animation: glitch-shake 0.3s infinite;
+}
+
+@keyframes glitch-shake {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+    text-shadow: 
+      2px 0 #00ff9d,
+      -2px 0 #ff00ff;
+  }
+  40% {
+    transform: translate(-2px, -2px);
+    text-shadow: 
+      -2px 0 #00ff9d,
+      2px 0 #ff00ff;
+  }
+  60% {
+    transform: translate(2px, 2px);
+    text-shadow: 
+      2px 0 #ff00ff,
+      -2px 0 #00ff9d;
+  }
+  80% {
+    transform: translate(2px, -2px);
+    text-shadow: 
+      -2px 0 #ff00ff,
+      2px 0 #00ff9d;
+  }
+}
+
+@keyframes glitch-1 {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+}
+
+@keyframes glitch-2 {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(2px, 2px);
+  }
+  40% {
+    transform: translate(2px, -2px);
+  }
+  60% {
+    transform: translate(-2px, 2px);
+  }
+  80% {
+    transform: translate(-2px, -2px);
+  }
+}
+
+/* Corner glow effect */
+.corner-glow {
+  position: relative;
+  animation: corner-pulse 2s ease-in-out infinite;
+}
+
+.corner-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: inherit;
+  border-color: rgba(0, 255, 157, 0.5);
+  filter: blur(4px);
+  opacity: 0;
+  animation: corner-glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes corner-pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes corner-glow-pulse {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Terminal line animation */
+.animate-terminal-line {
+  opacity: 0;
+  animation: terminal-fade-in 0.5s ease-in forwards;
+}
+
+@keyframes terminal-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Shimmer effect */
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 157, 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Scan effect */
+.animate-scan {
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }
 

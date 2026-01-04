@@ -33,6 +33,7 @@ export default function RootLayout({
     <html lang="en" className="dark scroll-smooth">
       <body
         className={`${spaceGrotesk.variable} ${firaCode.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}
+        suppressHydrationWarning
       >
         <Navigation />
         <main className="flex-1">{children}</main>

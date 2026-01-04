@@ -1,7 +1,23 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
+import { useState, useEffect } from "react"
+import { useTypeWriter } from "@/hooks/use-typewriter"
 
 export default function About() {
+  const [showContent, setShowContent] = useState(false)
+  const headingTyping = useTypeWriter("Dev_Access // Granted", 40, 0)
+
+  useEffect(() => {
+    if (headingTyping.isComplete) {
+      const timer = setTimeout(() => {
+        setShowContent(true)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [headingTyping.isComplete])
+
   return (
     <main className="relative min-h-screen pt-24 pb-12">
       {/* Background Grid */}
@@ -11,13 +27,32 @@ export default function About() {
         {/* Terminal Header */}
         <div className="mb-12">
           <p className="text-sm font-mono text-primary/70 mb-2">&lt; System.Rahul &gt; v1.0.0</p>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-            Dev_Access <span className="text-primary">// Granted</span>
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 min-h-[60px] md:min-h-[80px]">
+            {headingTyping.displayedText ? (
+              <>
+                {headingTyping.displayedText.includes("//") ? (
+                  <>
+                    {headingTyping.displayedText.split("//")[0]}
+                    <span className="text-primary">// {headingTyping.displayedText.split("//")[1] || ""}</span>
+                    {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+                  </>
+                ) : (
+                  <>
+                    {headingTyping.displayedText}
+                    {!headingTyping.isComplete && <span className="animate-blink">|</span>}
+                  </>
+                )}
+              </>
+            ) : (
+              <span className="animate-blink">|</span>
+            )}
           </h1>
         </div>
 
         {/* Main Content - Terminal Container */}
-        <div className="border border-primary/20 rounded-lg bg-muted/50 backdrop-blur-sm p-6 md:p-8 box-glow">
+        {showContent && (
+          <>
+          <div className="border border-primary/20 rounded-lg bg-muted/50 backdrop-blur-sm p-6 md:p-8 box-glow animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Left - Profile */}
             <div className="md:col-span-1 flex flex-col items-center">
@@ -124,7 +159,7 @@ export default function About() {
         </div>
 
         {/* Social Links Section */}
-        <div className="mt-16">
+        <div className="mt-16 animate-fade-in">
           <h3 className="text-sm font-mono text-primary uppercase tracking-wider mb-6">// Social_Uplink</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
@@ -161,6 +196,8 @@ export default function About() {
             ))}
           </div>
         </div>
+        </>
+        )}
       </div>
     </main>
   )
