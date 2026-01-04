@@ -357,6 +357,14 @@ export const EDUCATION_ITEMS: Education[] = [
   },
 ]
 
+// ============ EDUCATION STATS ============
+export const EDUCATION_STATS = [
+  { label: "Degrees", value: "1", suffix: "" },
+  { label: "Years Learning", value: "5", suffix: "+" },
+  { label: "Certifications", value: "10", suffix: "+" },
+  { label: "Skills Acquired", value: "20", suffix: "+" },
+] as const
+
 // ============ SOCIAL LINKS ============
 export const SOCIAL_LINKS: SocialLink[] = [
   {
