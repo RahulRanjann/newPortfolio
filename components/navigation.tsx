@@ -52,9 +52,9 @@ export default function Navigation() {
         </nav>
 
         {/* CTA Button */}
-        <button className="h-9 px-5 rounded bg-primary text-background font-bold text-sm hover:bg-white hover:shadow-[0_0_20px_rgba(0,255,157,0.7)] transition-all duration-300 transform hover:-translate-y-0.5 font-mono box-glow">
+        {/* <button className="h-9 px-5 rounded bg-primary text-background font-bold text-sm hover:bg-white hover:shadow-[0_0_20px_rgba(0,255,157,0.7)] transition-all duration-300 transform hover:-translate-y-0.5 font-mono box-glow">
           $ ./resume
-        </button>
+        </button> */}
       </div>
     </header>
   )

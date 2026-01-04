@@ -40,6 +40,10 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <Analytics />
+        <Script 
+          src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js" 
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   )

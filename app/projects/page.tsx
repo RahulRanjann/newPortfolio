@@ -2,25 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { useTypeWriter } from "@/hooks/use-typewriter"
-
-interface Project {
-  id: string
-  title: string
-  description: string
-  image: string
-  tags: string[]
-  status?: string
-  category: "all" | "full-stack" | "automation" | "ui-ux"
-  links?: {
-    source?: string
-    demo?: string
-  }
-}
+import { PROJECTS, PROJECT_FILTERS, PAGE_HEADINGS } from "@/constants/data"
 
 export default function Projects() {
   const [showContent, setShowContent] = useState(false)
   const [activeFilter, setActiveFilter] = useState("all")
-  const headingTyping = useTypeWriter("SELECTED_WORKS_", 40, 0)
+  const headingTyping = useTypeWriter(PAGE_HEADINGS.projects.title, 40, 0)
 
   useEffect(() => {
     if (headingTyping.isComplete) {
@@ -31,95 +18,7 @@ export default function Projects() {
     }
   }, [headingTyping.isComplete])
 
-  const projects: Project[] = [
-    {
-      id: 1,
-      title: "GitHub Profile Finder",
-      description:
-        "React app using GitHub API to surface profiles with bio, repos, and followers. Features dynamic fetching with clean, intuitive UI for discovering developers.",
-      image: "/cybersecurity-scan-interface.jpg",
-      tags: ["React", "GitHub API", "JavaScript"],
-      category: "full-stack",
-      links: {
-        source: "https://github.com/rahulranjann",
-        demo: "#",
-      },
-    },
-    {
-      id: 2,
-      title: "Go Milestone",
-      description:
-        "Official company site with Google Maps integration and phone country codes. Hosted on GitHub Pages with responsive design and optimization.",
-      image: "/crypto-dashboard.jpg",
-      tags: ["HTML5", "CSS3", "JavaScript", "Maps API"],
-      category: "ui-ux",
-      links: {
-        source: "https://github.com/rahulranjann",
-        demo: "#",
-      },
-    },
-    {
-      id: 3,
-      title: "TourTravel",
-      description:
-        "Travel booking site with authentication and ticketing via Firebase. Real-time chat support integrated with Tawk.to for customer assistance.",
-      image: "/secure-messaging-app.jpg",
-      tags: ["React", "Firebase", "Tawk.to"],
-      category: "full-stack",
-      links: {
-        source: "https://github.com/rahulranjann",
-        demo: "#",
-      },
-    },
-    {
-      id: 4,
-      title: "E-Commerce Platform",
-      description:
-        "Full-featured e-commerce application with product management, authentication, and shopping cart. Built with modern React and Firebase.",
-      image: "/ai-sentiment-analysis.jpg",
-      tags: ["React", "Firebase", "Tailwind CSS"],
-      category: "full-stack",
-      links: {
-        source: "https://github.com/rahulranjann",
-        demo: "#",
-      },
-    },
-    {
-      id: 5,
-      title: "Digital Ads Automation",
-      description:
-        "Automation system for Google Ads optimization using Google Ads API. Improved digital ad revenue through intelligent workflow automation.",
-      image: "/minimalist-portfolio-design.jpg",
-      tags: ["Node.js", "Google Ads API", "Python"],
-      category: "automation",
-      links: {
-        source: "https://github.com/rahulranjann",
-        demo: "#",
-      },
-    },
-    {
-      id: 6,
-      title: "Web Scraping Pipeline",
-      description:
-        "Automated scraping and data upload workflows for Lets Transport. Streamlined data processing with efficient pipeline architecture.",
-      image: "/project-management-interface.jpg",
-      tags: ["Python", "Web Scraping", "Automation"],
-      category: "automation",
-      links: {
-        source: "https://github.com/rahulranjann",
-        demo: "#",
-      },
-    },
-  ]
-
-  const filters = [
-    { id: "all", label: "ALL" },
-    { id: "full-stack", label: "FULL_STACK" },
-    { id: "automation", label: "AUTOMATION" },
-    { id: "ui-ux", label: "UI/UX" },
-  ]
-
-  const filtered = projects.filter((p) => activeFilter === "all" || p.category === activeFilter)
+  const filtered = PROJECTS.filter((p) => activeFilter === "all" || p.category === activeFilter)
 
   return (
     <main className="relative min-h-screen pt-24 pb-12">
@@ -130,7 +29,7 @@ export default function Projects() {
         {/* Header */}
         <div className="mb-12">
           <div className="inline-block mb-4">
-            <p className="text-sm font-mono text-primary/70 uppercase tracking-wider">• SYSTEM_MODULES</p>
+            <p className="text-sm font-mono text-primary/70 uppercase tracking-wider">{PAGE_HEADINGS.projects.prefix}</p>
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-white mb-4 min-h-[60px] md:min-h-[80px]">
             {headingTyping.displayedText ? (
@@ -153,7 +52,7 @@ export default function Projects() {
         {/* Filters */}
         {showContent && (
           <div className="flex flex-wrap gap-3 mb-12 animate-fade-in">
-          {filters.map((filter) => (
+          {PROJECT_FILTERS.map((filter) => (
             <button
               key={filter.id}
               onClick={() => setActiveFilter(filter.id)}

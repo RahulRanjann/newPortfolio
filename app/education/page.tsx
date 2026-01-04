@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { useTypeWriter } from "@/hooks/use-typewriter"
+import { EDUCATION_ITEMS, PAGE_HEADINGS } from "@/constants/data"
 
 export default function Education() {
   const [showContent, setShowContent] = useState(false)
-  const headingTyping = useTypeWriter("//EDUCATION", 40, 0)
+  const headingTyping = useTypeWriter(PAGE_HEADINGS.education.title, 40, 0)
 
   useEffect(() => {
     if (headingTyping.isComplete) {
@@ -15,34 +16,6 @@ export default function Education() {
       return () => clearTimeout(timer)
     }
   }, [headingTyping.isComplete])
-  const educationItems = [
-    {
-      icon: "🎓",
-      title: "B.Tech. in Computer Science",
-      institution: "Manipal Institute of Technology, Manipal",
-      period: "2022 - 2025",
-      details: `First Class. Focus on Full Stack Development and Machine Learning. Studying advanced algorithms, web technologies, and distributed systems.`,
-      tags: ["Full Stack Development", "ML", "Web Technologies"],
-    },
-    {
-      icon: "📚",
-      title: "Diploma in ITEMS",
-      institution: "Rajokari Institute of Technology, Delhi",
-      period: "2019 - 2022",
-      details:
-        "Strong foundation in mathematics and computer science. Prepared for advanced technical studies with focus on programming fundamentals.",
-      tags: ["Programming", "Math", "CS Fundamentals"],
-    },
-    {
-      icon: "💻",
-      title: "Full Stack Development",
-      institution: "Self-Taught & Industry Experience",
-      period: "2023 - Present",
-      details:
-        "Continuous learning through real-world projects, open-source contributions, and hands-on experience with modern web technologies.",
-      tags: ["React", "Node.js", "Cloud Technologies"],
-    },
-  ]
 
   return (
     <main className="relative min-h-screen pt-24 pb-12">
@@ -91,12 +64,12 @@ export default function Education() {
 
           {/* Items */}
           <div className="space-y-6">
-            {educationItems.map((item, idx) => (
+            {EDUCATION_ITEMS.map((item, idx) => (
               <div key={idx} className="flex gap-6">
                 {/* Timeline Dot */}
                 <div className="flex flex-col items-center mt-2 flex-shrink-0">
-                  <div className="relative z-10 w-12 h-12 rounded-full border-2 border-primary bg-muted flex items-center justify-center text-xl hover:scale-110 transition-transform">
-                    {item.icon}
+                  <div className="relative z-10 w-12 h-12 rounded-full border-2 border-primary bg-muted flex items-center justify-center hover:scale-110 transition-transform group">
+                    <item.icon className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
                   </div>
                 </div>
 

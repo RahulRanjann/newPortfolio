@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
+import { GITHUB_USERNAME } from '@/constants/data'
 
 export async function GET(request: Request) {
-  const username = 'rahulranjann'
+  const username = GITHUB_USERNAME
   const { searchParams } = new URL(request.url)
   const year = searchParams.get('year') ? parseInt(searchParams.get('year')!) : new Date().getFullYear()
   const month = searchParams.get('month') ? parseInt(searchParams.get('month')!) : new Date().getMonth() + 1

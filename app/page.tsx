@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
+import { HOME_DATA } from "@/constants/data"
 
 const useTypeWriter = (text: string, speed = 50, delay = 0) => {
   const [displayedText, setDisplayedText] = useState("")
@@ -63,12 +64,12 @@ const useTypeWriter = (text: string, speed = 50, delay = 0) => {
 }
 
 export default function Home() {
-  const nameTyping = useTypeWriter("Hi, I'm Rahul", 50, 0)
-  const roleTyping = useTypeWriter("> Full Stack Developer | Problem Solver_", 50, 1000)
+  const nameTyping = useTypeWriter(HOME_DATA.name, HOME_DATA.typingSpeed.name, HOME_DATA.typingDelay.name)
+  const roleTyping = useTypeWriter(HOME_DATA.role, HOME_DATA.typingSpeed.role, HOME_DATA.typingDelay.role)
   const descTyping = useTypeWriter(
-    "Blending tech and design to solve real problems. Building scalable web apps, automating workflows, and driving digital innovation. Let's turn lines of code into impactful solutions.",
-    30,
-    2000,
+    HOME_DATA.description,
+    HOME_DATA.typingSpeed.description,
+    HOME_DATA.typingDelay.description,
   )
 
   return (
@@ -177,14 +178,6 @@ export default function Home() {
             </svg>
             <span>$ ./contact</span>
           </Link>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-60 z-10 hidden md:flex flex-col items-center gap-2">
-          <span className="text-[10px] uppercase tracking-widest text-primary font-mono text-glow">[SCROLL]</span>
-          <svg className="w-6 h-6 text-primary drop-shadow-[0_0_8px_rgba(0,255,157,0.6)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
         </div>
       </div>
     </main>

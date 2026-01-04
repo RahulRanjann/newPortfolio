@@ -2,18 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTypeWriter } from "@/hooks/use-typewriter"
-
-
-interface Experience {
-  title: string
-  company: string
-  period: string
-  location: string
-  status: string
-  description: string[]
-  skills: string[]
-  isActive?: boolean
-}
+import { EXPERIENCES, STATS, PAGE_HEADINGS, GITHUB_USERNAME } from "@/constants/data"
 
 interface Contribution {
   date: string
@@ -28,7 +17,7 @@ export default function Experience() {
   const [loadingContributions, setLoadingContributions] = useState(true)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
-  const headingTyping = useTypeWriter("run experience.exe _", 40, 0)
+  const headingTyping = useTypeWriter(PAGE_HEADINGS.experience.title, 40, 0)
 
   useEffect(() => {
     if (headingTyping.isComplete) {
@@ -79,72 +68,6 @@ export default function Experience() {
     }
   }, [showContent, selectedYear, selectedMonth])
 
-  const experiences: Experience[] = [
-    {
-      title: "QA Engineer",
-      company: "Zinc",
-      period: "[2025.01 :: PRESENT]",
-      location: "Bangalore",
-      status: "ACTIVE_PROCESS",
-      description: [
-        "Automated testing for ADA platform.",
-        "Created AI 'talk to ADA' parent interface.",
-        "Focused on quality assurance and automation testing.",
-      ],
-      skills: ["Testing", "Automation", "QA"],
-      isActive: true,
-    },
-    {
-      title: "Digital Ads Automation & Full Stack Developer",
-      company: "Lets Transport",
-      period: "[2024.12 :: PRESENT]",
-      location: "Bangalore",
-      status: "ACTIVE_PROCESS",
-      description: [
-        "Built ad-optimization automations using Google Ads API.",
-        "Created scraping pipelines and upload workflows.",
-        "Improved digital ad revenue through automation.",
-      ],
-      skills: ["React", "Node.js", "Google Ads API", "Automation"],
-      isActive: true,
-    },
-    {
-      title: "Full Stack Developer",
-      company: "Lets Transport",
-      period: "[2024.05 :: 2024.08]",
-      location: "Bangalore",
-      description: [
-        "Built website that boosted traffic by 40% and profit by 7%.",
-        "Automated scraping and upload workflows.",
-        "Implemented responsive design and performance optimization.",
-      ],
-      skills: ["React", "Next.js", "MongoDB", "Node.js"],
-    },
-    {
-      title: "Full Stack Developer",
-      company: "Pine&Lime",
-      period: "[2024.03 :: 2024.05]",
-      location: "Gurgaon",
-      description: [
-        "Delivered full-featured e-commerce application.",
-        "Implemented authentication and product management systems.",
-        "Built responsive UI with Tailwind CSS.",
-      ],
-      skills: ["React", "Firebase", "Tailwind CSS", "JavaScript"],
-    },
-    {
-      title: "Full Stack Developer",
-      company: "GoMilestone",
-      period: "[2023.12 :: 2024.01]",
-      location: "Gurgaon",
-      description: [
-        "Developed responsive, scalable company website.",
-        "Used HTML, CSS, JavaScript and Bootstrap 5.",
-        "Optimized for cross-browser compatibility.",
-      ],
-      skills: ["HTML5", "CSS3", "Bootstrap 5", "JavaScript"],
-    },
-  ]
 
   return (
     <main className="relative min-h-screen pt-24 pb-12">
@@ -155,7 +78,7 @@ export default function Experience() {
         {/* Header */}
         <div className="mb-12">
           <div className="inline-block mb-4">
-            <p className="text-sm font-mono text-primary/70">&gt; SYSTEM_EXECUTION</p>
+            <p className="text-sm font-mono text-primary/70">{PAGE_HEADINGS.experience.prefix}</p>
           </div>
           <h1 className="text-4xl md:text-6xl font-black text-white min-h-[60px] md:min-h-[80px]">
             {headingTyping.displayedText ? (
@@ -195,7 +118,7 @@ export default function Experience() {
 
               {/* Experience Items */}
               <div className="space-y-8">
-                {experiences.map((exp, idx) => (
+                {EXPERIENCES.map((exp, idx) => (
                   <div
                     key={idx}
                     className="cursor-pointer relative"
@@ -289,25 +212,25 @@ export default function Experience() {
                 {/* Experience */}
                 <div>
                   <p className="text-xs text-gray-500 uppercase font-mono tracking-wider mb-2">EXPERIENCE</p>
-                  <p className="text-3xl font-bold text-primary">02</p>
-                  <p className="text-xs text-gray-400">years</p>
+                  <p className="text-3xl font-bold text-primary">{String(STATS.experience.years).padStart(2, '0')}</p>
+                  <p className="text-xs text-gray-400">{STATS.experience.label}</p>
                 </div>
 
                 {/* Projects */}
                 <div>
                   <p className="text-xs text-gray-500 uppercase font-mono tracking-wider mb-2">PROJECTS</p>
-                  <p className="text-3xl font-bold text-primary">15+</p>
-                  <p className="text-xs text-gray-400">deployed</p>
+                  <p className="text-3xl font-bold text-primary">{STATS.projects.count}</p>
+                  <p className="text-xs text-gray-400">{STATS.projects.label}</p>
                 </div>
 
                 {/* Contributions */}
                 <div>
                   <p className="text-xs text-gray-500 uppercase font-mono tracking-wider mb-2">CONTRIBUTIONS</p>
                   <p className="text-3xl font-bold text-primary">
-                    {totalContributions > 0 ? totalContributions : '100+'}
+                    {totalContributions > 0 ? totalContributions : STATS.contributions.default}
                   </p>
                   <p className="text-xs text-gray-400">
-                    {totalContributions > 0 ? 'this month' : 'approx'}
+                    {totalContributions > 0 ? 'this month' : STATS.contributions.label}
                   </p>
                 </div>
 
@@ -315,11 +238,7 @@ export default function Experience() {
                 <div className="pt-6 border-t border-primary/10">
                   <p className="text-xs text-gray-500 uppercase font-mono tracking-wider mb-4">SKILL_MATRIX</p>
                   <div className="space-y-3">
-                    {[
-                      { name: "TypeScript / React", percent: 98 },
-                      { name: "Python / Django", percent: 85 },
-                      { name: "System Architecture", percent: 90 },
-                    ].map((skill, i) => (
+                    {STATS.skillMatrix.map((skill, i) => (
                       <div key={i}>
                         <div className="flex justify-between items-center mb-1">
                           <span className="text-xs text-gray-400">{skill.name}</span>

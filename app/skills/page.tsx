@@ -2,23 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { useTypeWriter } from "@/hooks/use-typewriter"
-
-interface Skill {
-  name: string
-  percentage: number
-}
-
-interface SkillCategory {
-  title: string
-  status: string
-  skills: Skill[]
-  icon?: string
-}
+import { SKILL_CATEGORIES, PAGE_HEADINGS } from "@/constants/data"
 
 export default function Skills() {
   const [showContent, setShowContent] = useState(false)
   const [animateProgress, setAnimateProgress] = useState(false)
-  const headingTyping = useTypeWriter("SYSTEM_CAPABILITIES // SKILLS", 40, 0)
+  const headingTyping = useTypeWriter(PAGE_HEADINGS.skills.title, 40, 0)
 
   useEffect(() => {
     if (headingTyping.isComplete) {
@@ -33,61 +22,6 @@ export default function Skills() {
     }
   }, [headingTyping.isComplete])
 
-  const skillCategories: SkillCategory[] = [
-    {
-      title: "FRONTEND_MODULE",
-      status: "OPTIMIZED",
-      skills: [
-        { name: "React", percentage: 95 },
-        { name: "Next.js", percentage: 90 },
-        { name: "TypeScript", percentage: 92 },
-        { name: "Tailwind CSS", percentage: 95 },
-      ],
-    },
-    {
-      title: "BACKEND_SYSTEMS",
-      status: "OPERATIONAL",
-      skills: [
-        { name: "Node.js / Express", percentage: 85 },
-        { name: "Python / Django", percentage: 75 },
-        { name: "Firebase", percentage: 85 },
-        { name: "REST APIs", percentage: 90 },
-      ],
-    },
-    {
-      title: "DATA_PERSISTENCE",
-      status: "CONNECTED",
-      skills: [
-        { name: "MongoDB", percentage: 85 },
-        { name: "PostgreSQL", percentage: 80 },
-        { name: "MySQL", percentage: 75 },
-        { name: "Firebase DB", percentage: 85 },
-      ],
-      icon: "circular",
-    },
-    {
-      title: "DEVOPS_PROTOCOL",
-      status: "DEPLOYING",
-      skills: [
-        { name: "AWS", percentage: 80 },
-        { name: "Docker", percentage: 75 },
-        { name: "Vercel", percentage: 90 },
-        { name: "Nginx", percentage: 70 },
-      ],
-    },
-    {
-      title: "LANGUAGES",
-      status: "READY",
-      skills: [
-        { name: "JavaScript", percentage: 95 },
-        { name: "TypeScript", percentage: 92 },
-        { name: "Python", percentage: 80 },
-        { name: "Java", percentage: 75 },
-        { name: "Dart", percentage: 70 },
-        { name: "Bash", percentage: 80 },
-      ],
-    },
-  ]
 
   return (
     <main className="relative min-h-screen pt-24 pb-12">
@@ -131,7 +65,7 @@ export default function Skills() {
         {showContent && (
           <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-          {skillCategories.map((category, idx) => (
+          {SKILL_CATEGORIES.map((category, idx) => (
             <div
               key={idx}
               className="border border-primary/20 rounded-lg p-6 bg-muted/50 backdrop-blur-sm hover:border-primary/60 transition-all duration-300 box-glow animate-slide-up"
